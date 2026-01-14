@@ -16,7 +16,8 @@ COPY "pyproject.toml" "uv.lock" ".python-version" ./
 RUN uv sync --locked
 
 # Copy ingestion script
-COPY ingest_data.py ingest_data.py 
+COPY ingest_data.py homework_draft.py ./
 
 # Set entry point to run the ingestion script
-ENTRYPOINT [ "python", "ingest_data.py" ]
+# ENTRYPOINT ["bash"]
+ENTRYPOINT ["python", "ingest_data.py"]
