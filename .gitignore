@@ -1,4 +1,5 @@
 *.parquet
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -26,6 +27,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.idea/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

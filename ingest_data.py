@@ -2,11 +2,9 @@
 # coding: utf-8
 
 import pandas as pd
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import Session
 from tqdm.auto import tqdm
-from datetime import datetime
-import click
+
+
 
 url_prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow'
 
