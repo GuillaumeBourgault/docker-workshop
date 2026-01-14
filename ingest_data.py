@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
-import fsspec
 import sqlalchemy as sql
 import sqlalchemy.orm
 import pandas as pd
-from tqdm.auto import tqdm
-import pyarrow.parquet as pq
 
 
 def ingest_zones(engine: sql.engine.base.Engine) -> None:
