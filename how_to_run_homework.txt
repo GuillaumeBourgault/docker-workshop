@@ -1,6 +1,4 @@
-cd pipeline
-
 docker-compose up -d
 
-docker build -t ny_taxi:homework .
+docker build -t homework:1 .
 docker run -it homework:1

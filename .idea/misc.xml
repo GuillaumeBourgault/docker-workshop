@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Black">
-    <option name="sdkName" value="Python 3.13 (ecoinvent)" />
+    <option name="enabledOnSave" value="true" />
+    <option name="sdkName" value="Python 3.13 virtualenv at C:\repos\docker-workshop\.venv" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.14 (docker-workshop)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 virtualenv at C:\repos\docker-workshop\.venv" project-jdk-type="Python SDK" />
 </project>

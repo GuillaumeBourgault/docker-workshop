@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+import sqlalchemy as sql
+import sqlalchemy.orm
 import pandas as pd
 from tqdm.auto import tqdm
 
-
-
-url_prefix = 'https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow'
 
 dtype = {
     "VendorID": "Int64",
@@ -24,102 +22,70 @@ dtype = {
     "tolls_amount": "float64",
     "improvement_surcharge": "float64",
     "total_amount": "float64",
-    "congestion_surcharge": "float64"
+    "congestion_surcharge": "float64",
 }
 
-parse_dates = [
-    "tpep_pickup_datetime",
-    "tpep_dropoff_datetime"
-]
+parse_dates = ["tpep_pickup_datetime", "tpep_dropoff_datetime"]
 
-def is_data_present(engine,target_table,
-        year:int, 
-        month:int,)->bool:
-    start = datetime(year, month, 1)
-    end = datetime(year, month+1,1)
-    query = text(f'''
-        SELECT *
-        FROM {target_table}
-        WHERE tpep_pickup_datetime >= :start
-        AND tpep_pickup_datetime < :end
-        LIMIT 1
-        ''', 
-    )
-    with engine.connect() as conn:
-        rows = conn.execute(query, {"start": start, "end": end}).fetchall()
-        print('rows')
-        print(rows)
-    return True
 
-def ingest_data(
-        year:int, 
-        month:int,
-        engine,
-        target_table: str,
-        chunksize: int = 100000,
-        overwrite:bool=False
+def ingest_zones(engine: sql.engine.base.Engine) -> None:
+    session = sql.orm.sessionmaker(bind=engine)
+    Session = session()
+    table_name = "zones"
+    url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/misc/taxi_zone_lookup.csv"
+    df = pd.read_csv(url)
+    df.head(n=0).to_sql(name=table_name, con=engine, if_exists="replace")
+    df.to_sql(name=table_name, con=engine, if_exists="append")
+    zones = sql.Table(table_name, sql.MetaData(), autoload_with=engine)
+    nb_stored_rows = Session.query(zones).count()
+    assert nb_stored_rows == len(df)
+    print(f"{nb_stored_rows} taxi zones stored")
+
+
+def ingest_data_green(
+    engine,
 ) -> pd.DataFrame:
-    if overwrite or not is_data_present(engine, target_table, year, month):
-        url = f'{url_prefix}/yellow_tripdata_{year:04d}-{month:02d}.csv.gz'
-        print(url)
-        # before ingesting, check if there.  
-        df_iter = pd.read_csv(
-            url,
-            dtype=dtype,
-            parse_dates=parse_dates,
-            iterator=True,
-            chunksize=chunksize
-        )
+    url = (
+        "https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2025-11.parquet"
+    )
+    chunksize = 100000
+    df_iter = pd.read_csv(
+        url,
+        dtype=dtype,
+        parse_dates=parse_dates,
+        iterator=True,
+        chunksize=chunksize,
+    )
 
-        first_chunk = next(df_iter)
+    first_chunk = next(df_iter)
 
-        first_chunk.head(0).to_sql(
-            name=target_table,
-            con=engine,
-            if_exists="replace"
-        )
+    first_chunk.head(0).to_sql(name=target_table, con=engine, if_exists="replace")
 
-        print(f"Table {target_table} created")
+    print(f"Table {target_table} created")
 
-        first_chunk.to_sql(
-            name=target_table,
-            con=engine,
-            if_exists="append"
-        )
+    first_chunk.to_sql(name=target_table, con=engine, if_exists="append")
 
-        print(f"Inserted first chunk: {len(first_chunk)}")
+    print(f"Inserted first chunk: {len(first_chunk)}")
 
-        for df_chunk in tqdm(df_iter):
-            df_chunk.to_sql(
-                name=target_table,
-                con=engine,
-                if_exists="append"
-            )
-            print(f"Inserted chunk: {len(df_chunk)}")
+    for df_chunk in tqdm(df_iter):
+        df_chunk.to_sql(name=target_table, con=engine, if_exists="append")
+        print(f"Inserted chunk: {len(df_chunk)}")
 
-        print(f'done ingesting to {target_table}')
+    print(f"done ingesting to {target_table}")
+
 
 def main(
-        year=2025, 
-        month=11, 
-        pg_user='root', 
-        pg_pass='root', 
-        pg_host='pgdatabase', 
-        pg_port='5432', 
-        pg_db='ny_taxi', 
-        chunksize=100000, 
-        target_table='yello_taxi_data', 
-        overwrite=True
-    ):
-    engine = create_engine(f'postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
-    ingest_data(
-        year, 
-        month,
-        engine=engine,
-        target_table=target_table,
-        chunksize=chunksize,
-        overwrite=overwrite
+    pg_user="root",
+    pg_pass="root",
+    pg_host="localhost",
+    pg_port="5432",
+    pg_db="ny_taxi",
+):
+    engine = sql.create_engine(
+        f"postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}"
     )
+    ingest_zones(engine)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
