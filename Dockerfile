@@ -1,5 +1,5 @@
 # Start with slim Python 3.13 image for smaller size
-FROM python:3.13.11-slim
+FROM python:3.13
 
 # Copy uv binary from official uv image
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
@@ -18,6 +18,11 @@ RUN uv sync --locked
 # Copy ingestion script
 COPY ingest_data.py homework.py ./
 
+ENTRYPOINT ["bash"]
+
+#CMD ["uv", "run", "python", "ingest_data.py", "--pg-host", "pgdatabase"]
+#CMD ["uv", "run", "python", "homework.py", "--pg-host", "pgdatabase"]
+
 # Set entry point to run the ingestion script
-# ENTRYPOINT ["bash"]
-ENTRYPOINT ["python", "ingest_data.py"]
+#ENTRYPOINT ["python", "homework.py"]
+#ENTRYPOINT ["python", "ingest_data.py", "homework.py"]

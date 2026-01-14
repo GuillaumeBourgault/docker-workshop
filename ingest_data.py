@@ -3,6 +3,12 @@
 import sqlalchemy as sql
 import sqlalchemy.orm
 import pandas as pd
+import click
+
+pg_user = "root"
+pg_pass = "root"
+pg_port = "5432"
+pg_db = "ny_taxi"
 
 
 def ingest_zones(engine: sql.engine.base.Engine) -> None:
@@ -22,7 +28,7 @@ def ingest_zones(engine: sql.engine.base.Engine) -> None:
 def ingest_data_green(
     engine,
 ) -> pd.DataFrame:
-    table_name = "green"
+    table_name = "trips"
     url = (
         "https://d37ci6vzurychx.cloudfront.net/trip-data/green_tripdata_2025-11.parquet"
     )
@@ -37,13 +43,10 @@ def ingest_data_green(
     print(f"{nb_stored_rows} entries created in table {table}")
 
 
-def main(
-    pg_user="root",
-    pg_pass="root",
-    pg_host="localhost",
-    pg_port="5432",
-    pg_db="ny_taxi",
-):
+@click.command()
+@click.option("--pg-host", default="localhost")
+def main(pg_host: str = "localhost"):
+    print(f"postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}")
     engine = sql.create_engine(
         f"postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}"
     )

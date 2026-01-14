@@ -1,4 +1,3 @@
 docker-compose up -d
-
 docker build -t homework:1 .
-docker run -it homework:1
+docker run -rm --network docker-workshop_default homework:1
