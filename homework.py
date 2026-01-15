@@ -1,7 +1,4 @@
-import pandas as pd
 import sqlalchemy as sql
-from sqlalchemy.orm import Session
-from importlib.metadata import version
 import click
 
 pg_user = "root"
@@ -19,9 +16,9 @@ def main(pg_host: str = "localhost") -> None:
     )
     Zones = sql.Table("zones", sql.MetaData(), autoload_with=engine)
     Trips = sql.Table("trips", sql.MetaData(), autoload_with=engine)
-    # question3(engine, Trips)
-    # question4(engine, Trips)
-    # question5(engine, Trips, Zones)
+    question3(engine, Trips)
+    question4(engine, Trips)
+    question5(engine, Trips, Zones)
     question6(engine, Trips, Zones)
 
 
