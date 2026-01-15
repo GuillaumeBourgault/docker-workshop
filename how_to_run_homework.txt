@@ -1,3 +1,3 @@
 docker-compose up -d
 docker build -t homework:1 .
-docker run -rm --network docker-workshop_default homework:1
+docker run --rm --network docker-workshop_default homework:1 --pg-host pgdatabase

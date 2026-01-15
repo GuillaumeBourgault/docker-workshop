@@ -1,5 +1,6 @@
 import sqlalchemy as sql
 import click
+import ingest_data
 
 pg_user = "root"
 pg_pass = "root"
@@ -10,7 +11,10 @@ pg_db = "ny_taxi"
 
 @click.command()
 @click.option("--pg-host", default="localhost")
-def main(pg_host: str = "localhost") -> None:
+@click.option("--skip-ingestion", default=False)
+def main(pg_host: str = "localhost", skip_ingestion: bool = False) -> None:
+    if not skip_ingestion:
+        ingest_data.main(pg_host)
     engine = sql.create_engine(
         f"postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}"
     )

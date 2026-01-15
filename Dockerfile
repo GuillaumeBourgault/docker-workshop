@@ -18,11 +18,6 @@ RUN uv sync --locked
 # Copy ingestion script
 COPY ingest_data.py homework.py ./
 
-ENTRYPOINT ["bash"]
-
-#CMD ["uv", "run", "python", "ingest_data.py", "--pg-host", "pgdatabase"]
-#CMD ["uv", "run", "python", "homework.py", "--pg-host", "pgdatabase"]
-
 # Set entry point to run the ingestion script
-#ENTRYPOINT ["python", "homework.py"]
+ENTRYPOINT ["python", "homework.py"]
 #ENTRYPOINT ["python", "ingest_data.py", "homework.py"]
